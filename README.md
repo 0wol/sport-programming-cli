@@ -1,5 +1,5 @@
 # sport-programming-cli
-CLI App for simple copying from library
+CLI App for easy copying from library
 
 ## Installation
 Download app from Releases page. Add it to PATH and use anywhere.
