@@ -26,6 +26,12 @@ func main() {
 				Action:  commands.Get,
 				// BashComplete: ,
 			},
+			{
+				Name:    "list",
+				Aliases: []string{"ls"},
+				Usage:   "Get full directory",
+				Action:  commands.List,
+			},
 		},
 	}
 

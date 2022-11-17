@@ -3,7 +3,10 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"os"
+	"path/filepath"
+	"strings"
+
+	"sport-programming-cli/commands/file"
 
 	"github.com/urfave/cli/v2"
 )
@@ -29,12 +32,9 @@ func Get(ctx *cli.Context) error {
 		return errors.New("Invalid arguments count")
 	}
 
-	file, err := os.Open("./" + FunctionsFile)
-
-	if err != nil {
+	if !repositoryExists() {
 		return errors.New("Please, update library by [update]")
 	}
-	defer file.Close()
 
 	filter, err := getFilter(ctx)
 
@@ -42,13 +42,39 @@ func Get(ctx *cli.Context) error {
 		return err
 	}
 
-	function, err := getFunction(file, ctx.Args().First(), filter)
+	absPath, err := filepath.Abs("./" + RepositoryName)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(function)
+	dir, err := file.NewFile(RepositoryName, absPath)
+
+	if err != nil {
+		return err
+	}
+
+	var (
+		bodies string
+		query  = strings.ToLower(ctx.Args().First())
+	)
+
+	if filter == "file" {
+		bodies, err = dir.FindFunctionsByFileName(query)
+
+		if err != nil {
+			return err
+		}
+	} else {
+		bodies, err = dir.FindFunctionsByName(query)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println(strings.TrimSuffix(bodies, "\n\n"))
+
 	return nil
 }
 
@@ -72,4 +98,22 @@ func getFilter(ctx *cli.Context) (string, error) {
 	}
 
 	return filter, nil
+}
+
+func List(ctx *cli.Context) error {
+	absPath, err := filepath.Abs("./" + RepositoryName)
+
+	if err != nil {
+		return err
+	}
+
+	dir, err := file.NewFile(RepositoryName, absPath)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(strings.TrimSuffix(dir.GetTree(), "\n"))
+
+	return nil
 }

@@ -1,5 +1,5 @@
 # sport-programming-cli
-CLI App for easy copying from library
+CLI Application for easy copying from library
 
 ## Installation
 Download app from Releases page. Add it to PATH and use anywhere.
@@ -8,7 +8,7 @@ Download app from Releases page. Add it to PATH and use anywhere.
 - ### spc update - update library from  [sport-programming-library](https://github.com/0wol/sport-programming-library)
 - ### spc get - get function or file by name
   - #### Flags:
-    - filter [function, file]
+    - ```filter [function, file]```
   - #### Example: 
   ```
   $ spc get lcm -filter function
