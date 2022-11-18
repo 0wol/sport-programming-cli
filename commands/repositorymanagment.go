@@ -2,29 +2,10 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"strings"
 )
-
-func updateRepository() error {
-	var err error
-
-	if !repositoryExists() {
-		err = cloneRepository()
-	} else {
-		err = pullRepository()
-	}
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Library was successfully updated")
-
-	return nil
-}
 
 func cloneRepository() error {
 	cmd := exec.Command("git", "clone", Repository)

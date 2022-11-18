@@ -42,28 +42,31 @@ func (f *File) GetTree() string {
 }
 
 func (f *File) getTree(h int) string {
-	res := ""
-	for i := 0; i < h; i++ {
-		res += " "
-	}
-	res += f.Name + "\n"
+	const tabSize = 4
+
+	res := padding(h) + f.Name + "\n"
 
 	if f.IsDirectory {
 		for _, file := range f.files {
-			res += file.getTree(h + 4)
+			res += file.getTree(h + tabSize)
 		}
 	} else {
 		names, err := f.getFunctionsNames()
 		if err == nil {
 			for _, name := range names {
-				for i := 0; i < h+4; i++ {
-					res += " "
-				}
-				res += name + "\n"
+				res += padding(h+tabSize) + name + "\n"
 			}
 		}
 	}
+	return res
+}
 
+func padding(paddingLength int) string {
+	res := ""
+	for paddingLength > 0 {
+		res += " "
+		paddingLength--
+	}
 	return res
 }
 
@@ -188,38 +191,38 @@ func (f *File) getFunctionsBodiesByNames(functionsNames []string) (string, error
 		line := scanner.Text()
 
 		if strings.Contains(line, "{") {
-			if level == 0 {
-				if SliceContainsSimilar(functionsNames, strings.ToLower(getSignatureName(line))) {
-					if prev != "" {
-						res += prev + "\n"
-					}
-					res += line + "\n"
-					level++
-					for level > 0 && scanner.Scan() {
-						line := scanner.Text()
-
-						if strings.Contains(line, "{") {
-							level++
-						} else if strings.Contains(line, "}") {
-							level--
-						}
-						res += line + "\n"
-					}
-					res += "\n"
-				} else {
-					level++
+			if level == 0 && SliceContainsSimilar(functionsNames, strings.ToLower(getSignatureName(line))) {
+				if prev != "" { // if previous line contains template
+					res += prev + "\n"
 				}
+				res += line + "\n" + f.ParseFunctionBody(scanner)
 			} else {
 				level++
 			}
-		}
-
-		if strings.Contains(line, "}") {
+		} else if strings.Contains(line, "}") {
 			level--
 		}
-
 		prev = line
 	}
 
 	return res, nil
+}
+
+func (f *File) ParseFunctionBody(scanner *bufio.Scanner) string {
+	var (
+		res   = ""
+		level = 1
+	)
+	for level > 0 && scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.Contains(line, "{") {
+			level++
+		} else if strings.Contains(line, "}") {
+			level--
+		}
+		res += line + "\n"
+	}
+	res += "\n"
+	return res
 }

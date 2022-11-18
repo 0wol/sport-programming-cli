@@ -1,8 +1,6 @@
 package file
 
 import (
-	"bufio"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -64,30 +62,6 @@ func getFiles(dir string) ([]*File, error) {
 		}
 	}
 	return res, nil
-}
-
-func parseFile(file *os.File) []string {
-	var (
-		scanner    = bufio.NewScanner(file)
-		level      = 0
-		lineNumber = 0
-		res        []string
-	)
-
-	for scanner.Scan() {
-		lineNumber++
-		line := scanner.Text()
-		if strings.Contains(line, "{") {
-			if level == 0 {
-				fn := strings.Trim(line, "{ \t")
-				res = append(res, fmt.Sprintf("%s~%s~%d\n", getSignatureName(fn), file.Name(), lineNumber))
-			}
-			level++
-		} else if strings.Contains(line, "}") {
-			level--
-		}
-	}
-	return res
 }
 
 func getSignatureName(line string) string {
