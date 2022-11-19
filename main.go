@@ -4,14 +4,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli/v2"
 	"sport-programming-cli/commands"
+
+	"github.com/urfave/cli/v2"
 )
+
+const Version = "0.2.2"
 
 func main() {
 	app := &cli.App{
-		Name:                 "sport-programming-cli",
-		EnableBashCompletion: true,
+		Name:           "sport-programming-cli",
+		Usage:          "Simple CLI Application for copying from github.com/0wol/sport-programming-library",
+		Version:        Version,
+		DefaultCommand: "get",
 		Commands: []*cli.Command{
 			{
 				Name:    "update",
@@ -24,13 +29,19 @@ func main() {
 				Aliases: []string{"g"},
 				Usage:   "Get function/file by name",
 				Action:  commands.Get,
-				// BashComplete: ,
 			},
 			{
 				Name:    "list",
 				Aliases: []string{"ls"},
 				Usage:   "Get full directory",
 				Action:  commands.List,
+			},
+		},
+		EnableBashCompletion: true,
+		Authors: []*cli.Author{
+			&cli.Author{
+				Name:  "0w0l Team",
+				Email: "github.com/0wol",
 			},
 		},
 	}

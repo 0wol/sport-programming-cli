@@ -151,9 +151,7 @@ func (f *File) getFunctionsNames() ([]string, error) {
 				res = append(res, getSignatureName(line))
 			}
 			level++
-		}
-
-		if strings.Contains(line, "}") {
+		} else if strings.Contains(line, "}") {
 			level--
 		}
 	}

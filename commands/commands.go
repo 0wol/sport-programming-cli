@@ -3,9 +3,12 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"sport-programming-cli/commands/animation"
 	"sport-programming-cli/commands/file"
 
 	"github.com/urfave/cli/v2"
@@ -14,10 +17,10 @@ import (
 const (
 	Repository     = "https://github.com/0wol/sport-programming-library.git"
 	RepositoryName = "sport-programming-library"
-	FunctionsFile  = "functions.fn"
 	GreenColor     = "\033[0;32m"
 	RedColor       = "\033[0;31m"
 	YellowColor    = "\033[1;33m"
+	BlackColor     = "\033[0;37m"
 )
 
 func Update(ctx *cli.Context) error {
@@ -26,20 +29,28 @@ func Update(ctx *cli.Context) error {
 		printableResult string
 	)
 
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	anim := animation.Animations[r.Intn(len(animation.Animations))]
+
 	if !repositoryExists() {
 		fmt.Printf("%sDownloading...\n", YellowColor)
+		go anim.Run()
 		err = cloneRepository()
 		printableResult = "downloaded"
 	} else {
 		fmt.Printf("%sUpdating...\n", YellowColor)
+		go anim.Run()
 		err = pullRepository()
 		printableResult = "updated"
 	}
 
 	if err != nil {
+		// fmt.Println()
 		return errors.New(fmt.Sprintf("%sAn error was occurred", RedColor))
 	}
 
+	<-anim.Done
+	animation.ClearLine()
 	fmt.Printf("%sLibrary was successfully %s\n", GreenColor, printableResult)
 
 	return nil
@@ -119,6 +130,10 @@ func getFilter(ctx *cli.Context) (string, error) {
 }
 
 func List(ctx *cli.Context) error {
+	if !repositoryExists() {
+		return errors.New(fmt.Sprintf("%sPlease, update library by [update]", RedColor))
+	}
+
 	absPath, err := filepath.Abs("./" + RepositoryName)
 
 	if err != nil {

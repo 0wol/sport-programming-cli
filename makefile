@@ -1,4 +1,4 @@
-VERSION=v0_2
+VERSION=v0_2_2
 BINARY_NAME=spc
 
 build:
